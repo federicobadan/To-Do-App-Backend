@@ -6,7 +6,7 @@ const { pool } = require('../config/db')
  router.get("/tasks", async (req, res) => {
     let getTasks = [];
     try {
-        getTasks = await pool.query(`select * from tasks`);
+        getTasks = await pool.query(`SELECT * FROM tasks ORDER BY id DESC;`);
     }
     catch (error) {
        res.send(error);
@@ -18,27 +18,29 @@ const { pool } = require('../config/db')
  
  router.patch(`/task/:id`,  async (req, res) => {
     let edit=[];
-    if (req.body.info =='flag'){
-        try {
-            edit = await pool.query(`update tasks set flag = ${req.body.flag} where id=${req.params.id}` );
-        }
-        catch (error) {
-            res.send(error);
-        }
-        finally {   
-            res.send(`flag updated`)
-        }
-    }
-    else {
-        try {
-            edit = await pool.query(`update tasks set task = '${req.body.task}' where id=${req.params.id}` );
-        }
-        catch (error) {
-            res.send(error);
-        }
-        finally {   
-            res.send(`task updated`)
-        }
+    switch (req.body.info){
+        case 'flag':
+            try {
+                edit = await pool.query(`update tasks set flag = ${req.body.flag} where id=${req.params.id}` );
+            }
+            catch (error) {
+                res.send(error);
+            }
+            finally {   
+                res.send(`flag updated`)
+            }
+            return null;
+        case 'task':
+            try {
+                edit = await pool.query(`update tasks set task = '${req.body.task}' where id=${req.params.id}` );
+            }
+            catch (error) {
+                res.send(error);
+            }
+            finally {   
+                res.send(`task updated`)
+            }
+            return null;
     }
 })
 
@@ -53,7 +55,7 @@ router.post(`/task/:id`, async (req, res) => {
     try {
         sendTasks = await pool.query(`INSERT INTO tasks (task) VALUES('${req.body.task}')`);
         
-        updatedTasks = await pool.query(`SELECT * FROM tasks`);
+        updatedTasks = await pool.query(`SELECT * FROM tasks ORDER BY id DESC;`);
     }
     catch (error) {
        res.send(error);
