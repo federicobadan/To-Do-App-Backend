@@ -49,19 +49,18 @@ router.delete(`/task/:id`,  async (req, res) => {
     res.send('info deleted');
 })
 
-router.post(`/task/:id`, async (req, res) => {
+router.post(`/task`, async (req, res) => {
     let sendTasks = [];
     let updatedTasks = [];
     try {
         sendTasks = await pool.query(`INSERT INTO tasks (task) VALUES('${req.body.task}')`);
-        
-        updatedTasks = await pool.query(`SELECT * FROM tasks ORDER BY id DESC;`);
+        updatedTasks = await pool.query(`SELECT * FROM tasks ORDER BY id DESC LIMIT 1;`);
     }
     catch (error) {
        res.send(error);
     }
     finally {
-        res.send(updatedTasks.rows);
+        res.send(updatedTasks.rows[0]);
     }
  })
 
